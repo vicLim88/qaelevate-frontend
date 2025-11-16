@@ -18,7 +18,7 @@ export function useNetworkStats() {
         avgResponseTime: Math.max(100, prev.avgResponseTime + Math.floor(Math.random() * 20 - 10)),
         systemLoad: Math.min(1, Math.max(0.1, prev.systemLoad + (Math.random() * 0.1 - 0.05))),
       }));
-    }, ANIMATION_INTERVALS.NETWORK_UPDATE);
+    }, ANIMATION_INTERVALS.networkStats);
 
     return () => clearInterval(interval);
   }, []);
