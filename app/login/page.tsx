@@ -150,11 +150,7 @@ export default function LoginPage() {
 
           {/* Trust Indicators */}
           <div className="mt-8 text-center">
-            <div className="flex items-center justify-center space-x-6 text-gray-400 text-xs mb-4">
-              <div className="flex items-center">
-                <Shield className="w-4 h-4 mr-1" />
-                31 Nakamoto Coefficient
-              </div>
+            <div className="flex items-center justify-center space-x-6 text-gray-400 text-xs">
               <div className="flex items-center">
                 <Atom className="w-4 h-4 mr-1" />
                 Quantum Enhanced
@@ -163,20 +159,9 @@ export default function LoginPage() {
                 <Brain className="w-4 h-4 mr-1" />
                 Autonomous AI
               </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 text-xs">
-              <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-lg p-2 border border-green-500/20">
-                <div className="text-green-400 font-bold text-lg">95%</div>
-                <div className="text-gray-300">Cost Reduction</div>
-              </div>
-              <div className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-lg p-2 border border-blue-500/20">
-                <div className="text-blue-400 font-bold text-lg">65K</div>
-                <div className="text-gray-300">TPS Capacity</div>
-              </div>
-              <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg p-2 border border-purple-500/20">
-                <div className="text-purple-400 font-bold text-lg">400ms</div>
-                <div className="text-gray-300">Global Finality</div>
+              <div className="flex items-center">
+                <Shield className="w-4 h-4 mr-1" />
+                Enterprise Security
               </div>
             </div>
           </div>
