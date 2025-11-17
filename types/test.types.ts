@@ -83,6 +83,12 @@ export interface DiscoveredPage {
   depth: number;
   connections: string[]; // IDs of connected pages
   interactions: number; // Number of interactive elements
+  interactionDetails?: {
+    buttons: string[];
+    links: string[];
+    forms: string[];
+    inputs: string[];
+  };
   screenshot?: string;
   discoveredAt: Date;
   type: 'landing' | 'form' | 'content' | 'checkout' | 'auth' | 'other';
