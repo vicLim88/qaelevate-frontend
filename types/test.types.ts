@@ -76,6 +76,32 @@ export interface DiscoveryProgress {
   timeElapsed: number;
 }
 
+export interface DiscoveredPage {
+  id: string;
+  url: string;
+  title: string;
+  depth: number;
+  connections: string[]; // IDs of connected pages
+  interactions: number; // Number of interactive elements
+  screenshot?: string;
+  discoveredAt: Date;
+  type: 'landing' | 'form' | 'content' | 'checkout' | 'auth' | 'other';
+}
+
+export interface UserStory {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  pages: string[]; // IDs of pages involved
+  testCases: GeneratedTestCase[];
+  quantumScore: number; // Quantum optimization efficiency score
+  coverage: number; // Percentage of relevant pages covered
+  estimatedTime: number; // In seconds
+  aiConfidence: number;
+  status: 'generated' | 'optimizing' | 'ready' | 'executing' | 'completed';
+}
+
 export interface PaymentMetrics {
   web3: {
     transactionFee: number;
@@ -95,4 +121,4 @@ export interface PaymentMetrics {
 
 export type AuthType = 'web3' | 'traditional';
 export type WalletProvider = 'phantom' | 'solflare' | 'backpack';
-export type DashboardTab = 'overview' | 'tests' | 'agents' | 'quantum' | 'analytics';
+export type DashboardTab = 'overview' | 'discovery' | 'ai-generation' | 'tests' | 'agents';
