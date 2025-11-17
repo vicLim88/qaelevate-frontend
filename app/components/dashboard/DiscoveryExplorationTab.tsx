@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Activity, Eye, Layers, Zap, Search, X, MousePointer, FormInput, Link as LinkIcon } from 'lucide-react';
+import { Globe, Activity, Eye, Layers, Zap, Search, X, MousePointer, FormInput, Link as LinkIcon, Image } from 'lucide-react';
 import type { DiscoveredPage } from '@/types/test.types';
 import ReactFlow, { 
   Node, 
@@ -31,6 +31,19 @@ export function DiscoveryExplorationTab({
 }: DiscoveryExplorationTabProps) {
   const [viewMode, setViewMode] = useState<'graph' | 'grid'>('graph');
   const [selectedPage, setSelectedPage] = useState<DiscoveredPage | null>(null);
+  const [hoveredElement, setHoveredElement] = useState<string | null>(null);
+  const [expandedScreenshot, setExpandedScreenshot] = useState<boolean>(false);
+
+  // Handle ESC key to close modal
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && expandedScreenshot) {
+        setExpandedScreenshot(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [expandedScreenshot]);
 
   // Create hierarchical layout - top to bottom with generous horizontal spacing
   const getNodePosition = (page: DiscoveredPage, allPages: DiscoveredPage[]) => {
@@ -289,6 +302,171 @@ export function DiscoveryExplorationTab({
                 </div>
               </div>
 
+              {/* Screenshot with YOLO Detection */}
+              {selectedPage.screenshot && (
+                <div>
+                  <h4 className="text-sm font-medium text-white mb-2 flex items-center justify-between">
+                    <span className="flex items-center">
+                      <Image className="w-4 h-4 mr-2 text-cyan-400" />
+                      YOLO Object Detection
+                    </span>
+                    <button 
+                      onClick={() => setExpandedScreenshot(true)}
+                      className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+                    >
+                      Expand ↗
+                    </button>
+                  </h4>
+                  <div 
+                    className="relative bg-gray-900 rounded-lg border border-white/10 overflow-hidden cursor-pointer hover:border-purple-500/50 transition-all"
+                    onClick={() => setExpandedScreenshot(true)}
+                  >
+                    {/* Screenshot */}
+                    <img 
+                      src={selectedPage.screenshot} 
+                      alt={selectedPage.title}
+                      className="w-full h-auto"
+                    />
+                    
+                    {/* Bounding Boxes Overlay */}
+                    <svg 
+                      className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                      style={{ aspectRatio: '16/9' }}
+                    >
+                      {/* Draw bounding boxes for buttons */}
+                      {selectedPage.interactionDetails?.buttons.map((btn, idx) => 
+                        btn.boundingBox && (
+                          <g key={`btn-${idx}`}>
+                            <rect
+                              x={`${btn.boundingBox.x}%`}
+                              y={`${btn.boundingBox.y}%`}
+                              width={`${btn.boundingBox.width}%`}
+                              height={`${btn.boundingBox.height}%`}
+                              fill="none"
+                              stroke={hoveredElement === `button-${idx}` ? '#60a5fa' : '#3b82f6'}
+                              strokeWidth="2"
+                              className="transition-all"
+                              opacity={hoveredElement === `button-${idx}` ? 1 : 0.7}
+                            />
+                            <text
+                              x={`${btn.boundingBox.x}%`}
+                              y={`${btn.boundingBox.y - 1}%`}
+                              fill="#3b82f6"
+                              fontSize="10"
+                              fontWeight="bold"
+                            >
+                              Button
+                            </text>
+                          </g>
+                        )
+                      )}
+                      
+                      {/* Draw bounding boxes for links */}
+                      {selectedPage.interactionDetails?.links.map((link, idx) => 
+                        link.boundingBox && (
+                          <g key={`link-${idx}`}>
+                            <rect
+                              x={`${link.boundingBox.x}%`}
+                              y={`${link.boundingBox.y}%`}
+                              width={`${link.boundingBox.width}%`}
+                              height={`${link.boundingBox.height}%`}
+                              fill="none"
+                              stroke={hoveredElement === `link-${idx}` ? '#c084fc' : '#a855f7'}
+                              strokeWidth="2"
+                              className="transition-all"
+                              opacity={hoveredElement === `link-${idx}` ? 1 : 0.7}
+                            />
+                            <text
+                              x={`${link.boundingBox.x}%`}
+                              y={`${link.boundingBox.y - 1}%`}
+                              fill="#a855f7"
+                              fontSize="10"
+                              fontWeight="bold"
+                            >
+                              Link
+                            </text>
+                          </g>
+                        )
+                      )}
+                      
+                      {/* Draw bounding boxes for forms */}
+                      {selectedPage.interactionDetails?.forms.map((form, idx) => 
+                        form.boundingBox && (
+                          <g key={`form-${idx}`}>
+                            <rect
+                              x={`${form.boundingBox.x}%`}
+                              y={`${form.boundingBox.y}%`}
+                              width={`${form.boundingBox.width}%`}
+                              height={`${form.boundingBox.height}%`}
+                              fill="none"
+                              stroke={hoveredElement === `form-${idx}` ? '#34d399' : '#10b981'}
+                              strokeWidth="2"
+                              className="transition-all"
+                              opacity={hoveredElement === `form-${idx}` ? 1 : 0.7}
+                            />
+                            <text
+                              x={`${form.boundingBox.x}%`}
+                              y={`${form.boundingBox.y - 1}%`}
+                              fill="#10b981"
+                              fontSize="10"
+                              fontWeight="bold"
+                            >
+                              Form
+                            </text>
+                          </g>
+                        )
+                      )}
+                      
+                      {/* Draw bounding boxes for inputs */}
+                      {selectedPage.interactionDetails?.inputs.map((input, idx) => 
+                        input.boundingBox && (
+                          <g key={`input-${idx}`}>
+                            <rect
+                              x={`${input.boundingBox.x}%`}
+                              y={`${input.boundingBox.y}%`}
+                              width={`${input.boundingBox.width}%`}
+                              height={`${input.boundingBox.height}%`}
+                              fill="none"
+                              stroke={hoveredElement === `input-${idx}` ? '#fb923c' : '#f97316'}
+                              strokeWidth="2"
+                              className="transition-all"
+                              opacity={hoveredElement === `input-${idx}` ? 1 : 0.7}
+                            />
+                            <text
+                              x={`${input.boundingBox.x}%`}
+                              y={`${input.boundingBox.y - 1}%`}
+                              fill="#f97316"
+                              fontSize="10"
+                              fontWeight="bold"
+                            >
+                              Input
+                            </text>
+                          </g>
+                        )
+                      )}
+                    </svg>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2 text-xs">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 border-2 border-blue-500 mr-1"></div>
+                      <span className="text-gray-400">Buttons</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 border-2 border-purple-500 mr-1"></div>
+                      <span className="text-gray-400">Links</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 border-2 border-green-500 mr-1"></div>
+                      <span className="text-gray-400">Forms</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 border-2 border-orange-500 mr-1"></div>
+                      <span className="text-gray-400">Inputs</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Interactions Breakdown */}
               {selectedPage.interactionDetails && (
                 <div className="space-y-3">
@@ -304,10 +482,20 @@ export function DiscoveryExplorationTab({
                         <span className="text-xs font-medium text-blue-300">Buttons</span>
                         <span className="text-xs text-gray-400">{selectedPage.interactionDetails.buttons.length}</span>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         {selectedPage.interactionDetails.buttons.map((btn, idx) => (
-                          <div key={idx} className="text-xs text-gray-300 truncate pl-2 border-l-2 border-blue-500/30">
-                            {btn}
+                          <div 
+                            key={idx} 
+                            className="pl-2 border-l-2 border-blue-500/30 hover:border-blue-500 transition-all cursor-pointer"
+                            onMouseEnter={() => setHoveredElement(`button-${idx}`)}
+                            onMouseLeave={() => setHoveredElement(null)}
+                          >
+                            <div className="text-xs text-white font-medium">{btn.label}</div>
+                            {btn.boundingBox && (
+                              <div className="text-[9px] text-blue-400 mt-1">
+                                📍 Detected at: ({btn.boundingBox.x.toFixed(1)}%, {btn.boundingBox.y.toFixed(1)}%)
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -324,10 +512,21 @@ export function DiscoveryExplorationTab({
                         </span>
                         <span className="text-xs text-gray-400">{selectedPage.interactionDetails.links.length}</span>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         {selectedPage.interactionDetails.links.map((link, idx) => (
-                          <div key={idx} className="text-xs text-gray-300 truncate pl-2 border-l-2 border-purple-500/30">
-                            {link}
+                          <div 
+                            key={idx} 
+                            className="pl-2 border-l-2 border-purple-500/30 hover:border-purple-500 transition-all cursor-pointer"
+                            onMouseEnter={() => setHoveredElement(`link-${idx}`)}
+                            onMouseLeave={() => setHoveredElement(null)}
+                          >
+                            <div className="text-xs text-white font-medium">{link.text}</div>
+                            <div className="text-[10px] text-blue-400 truncate mt-0.5">→ {link.href}</div>
+                            {link.boundingBox && (
+                              <div className="text-[9px] text-purple-400 mt-1">
+                                📍 Detected at: ({link.boundingBox.x.toFixed(1)}%, {link.boundingBox.y.toFixed(1)}%)
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -341,10 +540,21 @@ export function DiscoveryExplorationTab({
                         <span className="text-xs font-medium text-green-300">Forms</span>
                         <span className="text-xs text-gray-400">{selectedPage.interactionDetails.forms.length}</span>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         {selectedPage.interactionDetails.forms.map((form, idx) => (
-                          <div key={idx} className="text-xs text-gray-300 truncate pl-2 border-l-2 border-green-500/30">
-                            {form}
+                          <div 
+                            key={idx} 
+                            className="pl-2 border-l-2 border-green-500/30 hover:border-green-500 transition-all cursor-pointer"
+                            onMouseEnter={() => setHoveredElement(`form-${idx}`)}
+                            onMouseLeave={() => setHoveredElement(null)}
+                          >
+                            <div className="text-xs text-white font-medium">{form.id}</div>
+                            <div className="text-[10px] text-green-400 mt-0.5">{form.fields} fields</div>
+                            {form.boundingBox && (
+                              <div className="text-[9px] text-green-400 mt-1">
+                                📍 Detected at: ({form.boundingBox.x.toFixed(1)}%, {form.boundingBox.y.toFixed(1)}%)
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -361,10 +571,21 @@ export function DiscoveryExplorationTab({
                         </span>
                         <span className="text-xs text-gray-400">{selectedPage.interactionDetails.inputs.length}</span>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         {selectedPage.interactionDetails.inputs.map((input, idx) => (
-                          <div key={idx} className="text-xs text-gray-300 truncate pl-2 border-l-2 border-orange-500/30">
-                            {input}
+                          <div 
+                            key={idx} 
+                            className="pl-2 border-l-2 border-orange-500/30 hover:border-orange-500 transition-all cursor-pointer"
+                            onMouseEnter={() => setHoveredElement(`input-${idx}`)}
+                            onMouseLeave={() => setHoveredElement(null)}
+                          >
+                            <div className="text-xs text-white font-medium">{input.name || 'Unnamed field'}</div>
+                            <div className="text-[10px] text-orange-400 mt-0.5">{input.type}</div>
+                            {input.boundingBox && (
+                              <div className="text-[9px] text-orange-400 mt-1">
+                                📍 Detected at: ({input.boundingBox.x.toFixed(1)}%, {input.boundingBox.y.toFixed(1)}%)
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -428,6 +649,143 @@ export function DiscoveryExplorationTab({
           💡 Click on any page in the graph or grid to view detailed interactions
         </div>
       </div>
+
+      {/* Expanded Screenshot Modal */}
+      {expandedScreenshot && selectedPage?.screenshot && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-8"
+          onClick={() => setExpandedScreenshot(false)}
+        >
+          <div className="relative max-w-7xl w-full max-h-full" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setExpandedScreenshot(false)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <div className="relative bg-gray-900 rounded-lg border border-white/20 overflow-auto max-h-[90vh]">
+              <img 
+                src={selectedPage.screenshot} 
+                alt={selectedPage.title}
+                className="w-full h-auto"
+              />
+              
+              {/* Bounding Boxes Overlay - Same as detail panel */}
+              <svg 
+                className="absolute top-0 left-0 w-full h-full pointer-events-none"
+                style={{ aspectRatio: '16/9' }}
+              >
+                {selectedPage.interactionDetails?.buttons.map((btn, idx) => 
+                  btn.boundingBox && (
+                    <g key={`btn-${idx}`}>
+                      <rect
+                        x={`${btn.boundingBox.x}%`}
+                        y={`${btn.boundingBox.y}%`}
+                        width={`${btn.boundingBox.width}%`}
+                        height={`${btn.boundingBox.height}%`}
+                        fill="none"
+                        stroke="#3b82f6"
+                        strokeWidth="3"
+                        opacity="0.8"
+                      />
+                      <text
+                        x={`${btn.boundingBox.x}%`}
+                        y={`${btn.boundingBox.y - 0.5}%`}
+                        fill="#3b82f6"
+                        fontSize="14"
+                        fontWeight="bold"
+                      >
+                        {btn.label}
+                      </text>
+                    </g>
+                  )
+                )}
+                
+                {selectedPage.interactionDetails?.links.map((link, idx) => 
+                  link.boundingBox && (
+                    <g key={`link-${idx}`}>
+                      <rect
+                        x={`${link.boundingBox.x}%`}
+                        y={`${link.boundingBox.y}%`}
+                        width={`${link.boundingBox.width}%`}
+                        height={`${link.boundingBox.height}%`}
+                        fill="none"
+                        stroke="#a855f7"
+                        strokeWidth="3"
+                        opacity="0.8"
+                      />
+                      <text
+                        x={`${link.boundingBox.x}%`}
+                        y={`${link.boundingBox.y - 0.5}%`}
+                        fill="#a855f7"
+                        fontSize="14"
+                        fontWeight="bold"
+                      >
+                        {link.text}
+                      </text>
+                    </g>
+                  )
+                )}
+                
+                {selectedPage.interactionDetails?.forms.map((form, idx) => 
+                  form.boundingBox && (
+                    <g key={`form-${idx}`}>
+                      <rect
+                        x={`${form.boundingBox.x}%`}
+                        y={`${form.boundingBox.y}%`}
+                        width={`${form.boundingBox.width}%`}
+                        height={`${form.boundingBox.height}%`}
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="3"
+                        opacity="0.8"
+                      />
+                      <text
+                        x={`${form.boundingBox.x}%`}
+                        y={`${form.boundingBox.y - 0.5}%`}
+                        fill="#10b981"
+                        fontSize="14"
+                        fontWeight="bold"
+                      >
+                        {form.id}
+                      </text>
+                    </g>
+                  )
+                )}
+                
+                {selectedPage.interactionDetails?.inputs.map((input, idx) => 
+                  input.boundingBox && (
+                    <g key={`input-${idx}`}>
+                      <rect
+                        x={`${input.boundingBox.x}%`}
+                        y={`${input.boundingBox.y}%`}
+                        width={`${input.boundingBox.width}%`}
+                        height={`${input.boundingBox.height}%`}
+                        fill="none"
+                        stroke="#f97316"
+                        strokeWidth="3"
+                        opacity="0.8"
+                      />
+                      <text
+                        x={`${input.boundingBox.x}%`}
+                        y={`${input.boundingBox.y - 0.5}%`}
+                        fill="#f97316"
+                        fontSize="14"
+                        fontWeight="bold"
+                      >
+                        {input.name}
+                      </text>
+                    </g>
+                  )
+                )}
+              </svg>
+            </div>
+            <div className="mt-4 text-center text-sm text-gray-300">
+              Click outside or press ESC to close • Hover over elements in detail panel to highlight
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

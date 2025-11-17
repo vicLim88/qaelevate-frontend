@@ -83,15 +83,15 @@ export interface DiscoveredPage {
   depth: number;
   connections: string[]; // IDs of connected pages
   interactions: number; // Number of interactive elements
-  interactionDetails?: {
-    buttons: string[];
-    links: string[];
-    forms: string[];
-    inputs: string[];
-  };
   screenshot?: string;
   discoveredAt: Date;
   type: 'landing' | 'form' | 'content' | 'checkout' | 'auth' | 'other';
+  interactionDetails?: {
+    buttons: Array<{ label: string; boundingBox?: { x: number; y: number; width: number; height: number } }>;
+    links: Array<{ text: string; href: string; boundingBox?: { x: number; y: number; width: number; height: number } }>;
+    forms: Array<{ id: string; fields: number; boundingBox?: { x: number; y: number; width: number; height: number } }>;
+    inputs: Array<{ type: string; name: string; boundingBox?: { x: number; y: number; width: number; height: number } }>;
+  };
 }
 
 export interface UserStory {
