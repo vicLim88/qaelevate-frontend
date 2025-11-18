@@ -12,6 +12,8 @@ import { AITestGenerationTab } from '@/app/components/dashboard/AITestGeneration
 import { EmptyTestSpaceState } from '@/app/components/dashboard/EmptyTestSpaceState';
 import { CreateTestSpaceForm } from '@/app/components/dashboard/CreateTestSpaceForm';
 import { AIGenerationProgress } from '@/app/components/dashboard/AIGenerationProgress';
+import { CreateTestForm } from '@/app/components/dashboard/CreateTestForm';
+import { TestDiscoveryProgress } from '@/app/components/dashboard/TestDiscoveryProgress';
 import { useNetworkStats } from '@/hooks/useNetworkStats';
 import { useQuantumMetrics } from '@/hooks/useQuantumMetrics';
 import { useLiveTestUpdates } from '@/hooks/useLiveTestUpdates';
@@ -19,9 +21,18 @@ import type { DashboardTab, TestJob, AIAgent, User, DiscoveredPage, UserStory, T
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
-  const [view, setView] = useState<'dashboard' | 'create' | 'generating'>('dashboard');
-  const [testSpaces, setTestSpaces] = useState<TestSpace[]>([]);
+  const [view, setView] = useState<'dashboard' | 'create' | 'generating' | 'createTest' | 'testDiscovering'>('dashboard');
+  const [testSpaces, setTestSpaces] = useState<TestSpace[]>([
+    { id: 'space-001', name: 'E-Commerce App', type: 'web', url: 'https://ecommerce-demo.com', status: 'active', testCases: 45, createdAt: new Date(), aiGenerated: true, quantumOptimized: true },
+    { id: 'space-002', name: 'Banking Portal', type: 'web', url: 'https://banking-app.demo', status: 'active', testCases: 67, createdAt: new Date(), aiGenerated: true, quantumOptimized: true },
+  ]);
   const [currentProgress, setCurrentProgress] = useState<DiscoveryProgress | null>(null);
+  const [testDiscoveryProgress, setTestDiscoveryProgress] = useState<{
+    progress: number;
+    phase: 'discovering' | 'mapping' | 'detecting' | 'generating' | 'optimizing' | 'completed';
+    metrics: { pagesDiscovered: number; flowsMapped: number; testsGenerated: number; elementsDetected: number };
+    url: string;
+  } | null>(null);
   const networkStats = useNetworkStats();
   const quantumMetrics = useQuantumMetrics();
 
@@ -552,20 +563,97 @@ export default function DashboardPage() {
   ];
 
   const startNewTest = () => {
-    const newTest: TestJob = {
-      id: `test-${Date.now()}`,
-      url: 'https://new-application.com',
-      status: 'discovering',
-      progress: 0,
-      startTime: new Date(),
-      testCases: 0,
-      passed: 0,
-      failed: 0,
-      quantumOptimized: true,
-      cost: 0,
-    };
-    setTestJobs((prev) => [newTest, ...prev]);
+    setView('createTest');
   };
+
+  const handleCreateTest = (data: { url: string; testSpace: string; applicationType: 'web' | 'android' | 'ios' }) => {
+    // Initialize test discovery progress
+    setTestDiscoveryProgress({
+      progress: 0,
+      phase: 'discovering',
+      metrics: { pagesDiscovered: 0, flowsMapped: 0, testsGenerated: 0, elementsDetected: 0 },
+      url: data.url,
+    });
+    setView('testDiscovering');
+  };
+
+  // Simulate test discovery progress
+  useEffect(() => {
+    if (view === 'testDiscovering' && testDiscoveryProgress) {
+      const interval = setInterval(() => {
+        setTestDiscoveryProgress((prev) => {
+          if (!prev) return prev;
+          
+          const newProgress = Math.min(prev.progress + Math.random() * 3 + 1, 100);
+          let phase = prev.phase;
+          let pagesDiscovered = prev.metrics.pagesDiscovered;
+          let flowsMapped = prev.metrics.flowsMapped;
+          let testsGenerated = prev.metrics.testsGenerated;
+          let elementsDetected = prev.metrics.elementsDetected;
+          
+          if (newProgress < 20) {
+            phase = 'discovering';
+            pagesDiscovered = Math.floor(newProgress * 0.5);
+          } else if (newProgress < 40) {
+            phase = 'mapping';
+            pagesDiscovered = Math.floor(newProgress * 0.5);
+            flowsMapped = Math.floor((newProgress - 20) * 0.3);
+          } else if (newProgress < 60) {
+            phase = 'detecting';
+            pagesDiscovered = Math.floor(newProgress * 0.5);
+            flowsMapped = Math.floor((newProgress - 20) * 0.3);
+            elementsDetected = Math.floor((newProgress - 40) * 2);
+          } else if (newProgress < 80) {
+            phase = 'generating';
+            pagesDiscovered = Math.floor(newProgress * 0.5);
+            flowsMapped = Math.floor((newProgress - 20) * 0.3);
+            elementsDetected = Math.floor((newProgress - 40) * 2);
+            testsGenerated = Math.floor((newProgress - 60) * 0.4);
+          } else if (newProgress < 100) {
+            phase = 'optimizing';
+            pagesDiscovered = Math.floor(newProgress * 0.5);
+            flowsMapped = Math.floor((newProgress - 20) * 0.3);
+            elementsDetected = Math.floor((newProgress - 40) * 2);
+            testsGenerated = Math.floor((newProgress - 60) * 0.4);
+          } else {
+            phase = 'completed';
+            pagesDiscovered = 15;
+            flowsMapped = 8;
+            elementsDetected = 42;
+            testsGenerated = 23;
+            
+            // Add the new test job
+            setTimeout(() => {
+              const newTest: TestJob = {
+                id: `test-${Date.now()}`,
+                url: prev.url,
+                status: 'completed',
+                progress: 100,
+                startTime: new Date(),
+                testCases: testsGenerated,
+                passed: testsGenerated - 2,
+                failed: 2,
+                quantumOptimized: true,
+                cost: 0.0125,
+              };
+              setTestJobs((prevJobs) => [newTest, ...prevJobs]);
+              setView('dashboard');
+              setTestDiscoveryProgress(null);
+            }, 2000);
+          }
+          
+          return {
+            ...prev,
+            progress: newProgress,
+            phase,
+            metrics: { pagesDiscovered, flowsMapped, testsGenerated, elementsDetected },
+          };
+        });
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [view, testDiscoveryProgress]);
 
   return (
     <DashboardLayout user={user} networkStats={networkStats} showNetworkBar={false}>
@@ -585,6 +673,25 @@ export default function DashboardPage() {
       {/* Show AI generation progress */}
       {view === 'generating' && currentProgress && (
         <AIGenerationProgress progress={currentProgress} />
+      )}
+
+      {/* Show create test form */}
+      {view === 'createTest' && (
+        <CreateTestForm
+          onCancel={() => setView('dashboard')}
+          onCreate={handleCreateTest}
+          testSpaces={testSpaces.map(space => ({ id: space.id, name: space.name }))}
+        />
+      )}
+
+      {/* Show test discovery progress */}
+      {view === 'testDiscovering' && testDiscoveryProgress && (
+        <TestDiscoveryProgress
+          progress={testDiscoveryProgress.progress}
+          phase={testDiscoveryProgress.phase}
+          metrics={testDiscoveryProgress.metrics}
+          url={testDiscoveryProgress.url}
+        />
       )}
 
       {/* Show normal dashboard tabs when test spaces exist */}

@@ -6,14 +6,27 @@ import {
 
 const QAEvelateTestSpaces = () => {
   const [view, setView] = useState('dashboard');
-  const [testSpaces, setTestSpaces] = useState([]);
+  const [testSpaces, setTestSpaces] = useState<Array<{
+    id: string;
+    name: string;
+    type: string;
+    url: string;
+    status: string;
+    testCount: number;
+  }>>([]);
   const [newSpace, setNewSpace] = useState({
     name: '',
     type: 'web',
     url: ''
   });
   const [progress, setProgress] = useState(0);
-  const [generatedTests, setGeneratedTests] = useState([]);
+  const [generatedTests, setGeneratedTests] = useState<Array<{
+    id: string;
+    title: string;
+    type: string;
+    priority: string;
+    confidence: number;
+  }>>([]);
 
   // Simulate progress when generating
   useEffect(() => {
@@ -68,11 +81,11 @@ const QAEvelateTestSpaces = () => {
     if (!newSpace.name || !newSpace.url) return;
     
     setTestSpaces(prev => [...prev, {
-      id: Date.now(),
+      id: Date.now().toString(),
       name: newSpace.name,
       url: newSpace.url,
       type: newSpace.type,
-      testCases: 0,
+      testCount: 0,
       status: 'generating'
     }]);
     
@@ -80,7 +93,7 @@ const QAEvelateTestSpaces = () => {
     setView('generating');
   };
 
-  const getPriorityColor = (priority) => {
+  const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/30';
       case 'high': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
@@ -90,7 +103,7 @@ const QAEvelateTestSpaces = () => {
     }
   };
 
-  const getTypeIcon = (type) => {
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case 'functional': return <Bot className="w-4 h-4" />;
       case 'visual': return <Eye className="w-4 h-4" />;
@@ -205,7 +218,7 @@ const QAEvelateTestSpaces = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-white">{space.testCases}</div>
+                      <div className="text-2xl font-bold text-white">{space.testCount}</div>
                       <div className="text-sm text-gray-400">test cases</div>
                     </div>
                   </div>
