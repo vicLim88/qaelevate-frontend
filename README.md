@@ -40,6 +40,7 @@ Comprehensive documentation organized by topic:
 
 ### Features
 
+- **[Test Space Onboarding](./documentation/features/TEST_SPACE_ONBOARDING.md)** - First-time user experience and test space creation flow
 - **[Discovery & Exploration](./documentation/features/DISCOVERY_EXPLORATION.md)** - Autonomous web crawling with network visualization
 - **[YOLO Detection](./documentation/features/YOLO_DETECTION.md)** - Visual element detection with bounding boxes
 - **[AI Test Generation](./documentation/features/AI_TEST_GENERATION.md)** - Automated test case creation from user flows

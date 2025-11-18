@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart3, Target, Bot, Globe, Brain } from 'lucide-react';
 import { DashboardLayout } from '@/app/components/layout/DashboardLayout';
 import { TabNavigation } from '@/app/components/layout/TabNavigation';
@@ -9,13 +9,19 @@ import { TestJobsTab } from '@/app/components/dashboard/TestJobsTab';
 import { AIAgentsTab } from '@/app/components/dashboard/AIAgentsTab';
 import { DiscoveryExplorationTab } from '@/app/components/dashboard/DiscoveryExplorationTab';
 import { AITestGenerationTab } from '@/app/components/dashboard/AITestGenerationTab';
+import { EmptyTestSpaceState } from '@/app/components/dashboard/EmptyTestSpaceState';
+import { CreateTestSpaceForm } from '@/app/components/dashboard/CreateTestSpaceForm';
+import { AIGenerationProgress } from '@/app/components/dashboard/AIGenerationProgress';
 import { useNetworkStats } from '@/hooks/useNetworkStats';
 import { useQuantumMetrics } from '@/hooks/useQuantumMetrics';
 import { useLiveTestUpdates } from '@/hooks/useLiveTestUpdates';
-import type { DashboardTab, TestJob, AIAgent, User, DiscoveredPage, UserStory } from '@/types/test.types';
+import type { DashboardTab, TestJob, AIAgent, User, DiscoveredPage, UserStory, TestSpace, DiscoveryProgress } from '@/types/test.types';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('overview');
+  const [view, setView] = useState<'dashboard' | 'create' | 'generating'>('dashboard');
+  const [testSpaces, setTestSpaces] = useState<TestSpace[]>([]);
+  const [currentProgress, setCurrentProgress] = useState<DiscoveryProgress | null>(null);
   const networkStats = useNetworkStats();
   const quantumMetrics = useQuantumMetrics();
 
@@ -99,6 +105,89 @@ export default function DashboardPage() {
 
   // Enable live updates
   useLiveTestUpdates(testJobs, setTestJobs);
+
+  // Simulate AI generation progress
+  useEffect(() => {
+    if (view === 'generating' && currentProgress) {
+      const interval = setInterval(() => {
+        setCurrentProgress(prev => {
+          if (!prev) return null;
+          
+          const newProgress = Math.min(100, prev.progress + Math.random() * 5);
+          const timeElapsed = prev.timeElapsed + 1000;
+          
+          // Update metrics based on progress
+          const pagesFound = Math.floor((newProgress / 100) * 30);
+          const flowsDiscovered = Math.floor((newProgress / 100) * 20);
+          const testCasesGenerated = Math.floor((newProgress / 100) * 40);
+          
+          // Update phase based on progress
+          let phase: DiscoveryProgress['phase'] = 'analyzing';
+          let currentAction = 'Analyzing application structure...';
+          
+          if (newProgress > 25) {
+            phase = 'mapping';
+            currentAction = 'Mapping user flows and interactions...';
+          }
+          if (newProgress > 50) {
+            phase = 'generating';
+            currentAction = 'Generating test cases with AI...';
+          }
+          if (newProgress > 75) {
+            phase = 'optimizing';
+            currentAction = 'Optimizing test suite with quantum algorithms...';
+          }
+          if (newProgress >= 100) {
+            phase = 'completed';
+            currentAction = 'Test generation completed!';
+            
+            // Complete the generation
+            setTimeout(() => {
+              setView('dashboard');
+              setCurrentProgress(null);
+            }, 2000);
+          }
+          
+          return {
+            phase,
+            progress: newProgress,
+            currentAction,
+            pagesFound,
+            flowsDiscovered,
+            testCasesGenerated,
+            timeElapsed,
+          };
+        });
+      }, 1000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [view, currentProgress]);
+
+  // Handle test space creation
+  const handleCreateTestSpace = (spaceData: Omit<TestSpace, 'id' | 'createdAt' | 'lastRun'>) => {
+    const newSpace: TestSpace = {
+      ...spaceData,
+      id: `space-${Date.now()}`,
+      createdAt: new Date(),
+      testCases: 0,
+    };
+    
+    setTestSpaces(prev => [...prev, newSpace]);
+    
+    // Start AI generation
+    setCurrentProgress({
+      phase: 'analyzing',
+      progress: 0,
+      currentAction: 'Initializing AI agents...',
+      pagesFound: 0,
+      flowsDiscovered: 0,
+      testCasesGenerated: 0,
+      timeElapsed: 0,
+    });
+    
+    setView('generating');
+  };
 
   // Mock discovered pages
   const [discoveredPages] = useState<DiscoveredPage[]>([
@@ -480,40 +569,63 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout user={user} networkStats={networkStats} showNetworkBar={false}>
-      <TabNavigation tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+      {/* Show empty state if no test spaces */}
+      {testSpaces.length === 0 && view === 'dashboard' && (
+        <EmptyTestSpaceState onCreateSpace={() => setView('create')} />
+      )}
 
-      {activeTab === 'overview' && (
-        <OverviewTab
-          testJobs={testJobs}
-          aiAgents={aiAgents}
-          quantumMetrics={quantumMetrics}
-          onNewTest={startNewTest}
+      {/* Show create form */}
+      {view === 'create' && (
+        <CreateTestSpaceForm
+          onCancel={() => setView('dashboard')}
+          onCreate={handleCreateTestSpace}
         />
       )}
 
-      {activeTab === 'discovery' && (
-        <DiscoveryExplorationTab
-          discoveredPages={discoveredPages}
-          isExploring={testJobs.some(job => job.status === 'discovering')}
-          explorationMetrics={{
-            totalPages: discoveredPages.length,
-            explorationDepth: Math.max(...discoveredPages.map(p => p.depth)),
-            pagesPerMinute: 12,
-            coverage: 87,
-          }}
-        />
+      {/* Show AI generation progress */}
+      {view === 'generating' && currentProgress && (
+        <AIGenerationProgress progress={currentProgress} />
       )}
 
-      {activeTab === 'ai-generation' && (
-        <AITestGenerationTab
-          userStories={userStories}
-          isGenerating={testJobs.some(job => job.status === 'optimizing')}
-        />
+      {/* Show normal dashboard tabs when test spaces exist */}
+      {testSpaces.length > 0 && view === 'dashboard' && (
+        <>
+          <TabNavigation tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+
+          {activeTab === 'overview' && (
+            <OverviewTab
+              testJobs={testJobs}
+              aiAgents={aiAgents}
+              quantumMetrics={quantumMetrics}
+              onNewTest={startNewTest}
+            />
+          )}
+
+          {activeTab === 'discovery' && (
+            <DiscoveryExplorationTab
+              discoveredPages={discoveredPages}
+              isExploring={testJobs.some(job => job.status === 'discovering')}
+              explorationMetrics={{
+                totalPages: discoveredPages.length,
+                explorationDepth: Math.max(...discoveredPages.map(p => p.depth)),
+                pagesPerMinute: 12,
+                coverage: 87,
+              }}
+            />
+          )}
+
+          {activeTab === 'ai-generation' && (
+            <AITestGenerationTab
+              userStories={userStories}
+              isGenerating={testJobs.some(job => job.status === 'optimizing')}
+            />
+          )}
+
+          {activeTab === 'tests' && <TestJobsTab testJobs={testJobs} onNewTest={startNewTest} />}
+
+          {activeTab === 'agents' && <AIAgentsTab agents={aiAgents} />}
+        </>
       )}
-
-      {activeTab === 'tests' && <TestJobsTab testJobs={testJobs} onNewTest={startNewTest} />}
-
-      {activeTab === 'agents' && <AIAgentsTab agents={aiAgents} />}
     </DashboardLayout>
   );
 }
