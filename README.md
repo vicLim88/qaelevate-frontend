@@ -8,12 +8,12 @@
 
 ## Overview
 
-QA Elevate is a revolutionary testing platform that combines **quantum-inspired optimization**, **autonomous AI agents**, and **YOLO-based visual detection** to automatically discover, explore, and test web applications with minimal human intervention.
+QA Elevate is a revolutionary testing platform that combines **quantum-inspired optimization**, **autonomous AI agents**, and **computer vision AI** to automatically discover, explore, and test web applications with minimal human intervention.
 
 ### Key Features
 
 🤖 **Autonomous Web Crawling** - AI agents automatically discover and map all pages in your web application  
-🎯 **YOLO Visual Detection** - Computer vision-based element detection using bounding boxes (no CSS selectors needed)  
+🎯 **Visual AI Detection** - Computer vision-based element detection using bounding boxes (no CSS selectors needed)  
 ✨ **AI-Generated User Stories** - Automatically creates test scenarios based on discovered user flows  
 ⚡ **Quantum-Optimized Testing** - Prioritizes test cases using quantum-inspired algorithms  
 📊 **Real-Time Monitoring** - Live updates on test execution and network metrics  
@@ -42,7 +42,7 @@ Comprehensive documentation organized by topic:
 
 - **[Test Space Onboarding](./documentation/features/TEST_SPACE_ONBOARDING.md)** - First-time user experience and test space creation flow
 - **[Discovery & Exploration](./documentation/features/DISCOVERY_EXPLORATION.md)** - Autonomous web crawling with network visualization
-- **[YOLO Detection](./documentation/features/YOLO_DETECTION.md)** - Visual element detection with bounding boxes
+- **[Visual Detection](./documentation/features/VISUAL_DETECTION.md)** - Computer vision-based element detection with bounding boxes
 - **[AI Test Generation](./documentation/features/AI_TEST_GENERATION.md)** - Automated test case creation from user flows
 - **[Quantum Optimization](./documentation/features/QUANTUM_OPTIMIZATION.md)** - Intelligent test prioritization
 
@@ -76,7 +76,9 @@ Autonomous AI agents crawl your web application and create an interactive site m
 **Highlights:**
 
 - Hierarchical graph visualization with top-down layout
-- YOLO-style bounding boxes on screenshots
+- Autonomous page discovery with interactive network graph
+- Computer vision bounding boxes on screenshots
+- Real-time test execution monitoring
 - Click-to-expand screenshot viewer
 - Hover to highlight elements
 - Real-time exploration metrics
@@ -143,7 +145,7 @@ frontend/
 │   │       └── AIAgentsTab.tsx
 │   └── login/                       # Authentication
 ├── types/                            # TypeScript definitions
-│   └── test.types.ts               # Testing types with YOLO data
+│   └── test.types.ts               # Testing types with visual detection data
 ├── hooks/                            # Custom React hooks
 │   ├── useLiveTestUpdates.ts       # Real-time updates
 │   └── useQuantumMetrics.ts        # Quantum optimization

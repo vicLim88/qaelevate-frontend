@@ -35,7 +35,7 @@ export function TestDiscoveryProgress({ progress, phase, metrics, url }: TestDis
       label: 'Detecting Elements', 
       icon: Sparkles, 
       color: 'text-cyan-400',
-      description: 'YOLO computer vision is detecting all interactive elements'
+      description: 'Computer vision AI is detecting all interactive elements'
     },
     generating: { 
       label: 'Generating Tests', 

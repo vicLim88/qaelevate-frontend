@@ -127,7 +127,7 @@ export function CreateTestForm({ onCancel, onCreate, testSpaces }: CreateTestFor
                   AI-Powered Testing
                 </h4>
                 <p className="text-xs text-gray-300">
-                  Our AI agents will automatically discover pages, map user flows, detect visual elements with YOLO, 
+                  Our AI agents will automatically discover pages, map user flows, detect visual elements with computer vision AI, 
                   and generate comprehensive test cases using quantum-optimized algorithms.
                 </p>
               </div>

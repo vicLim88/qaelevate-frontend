@@ -34,7 +34,7 @@ See all interactive elements discovered on each page:
 
 ### 🖼️ Screenshot Visualization
 
-- **YOLO-Style Detection**: Visual bounding boxes on page screenshots
+- **Visual AI Detection**: Computer vision-based bounding boxes on page screenshots
 - **Click-to-Expand**: Full-size screenshot viewing
 - **Hover Highlights**: Hover over elements to see corresponding bounding boxes
 - **Color Coding**: Different colors for different element types
@@ -55,7 +55,7 @@ const startUrl = 'https://your-app.com';
 
 ### 2. Visual Detection
 
-Using YOLO (You Only Look Once) style computer vision:
+Using advanced computer vision AI:
 
 ```typescript
 interface BoundingBox {
@@ -209,7 +209,7 @@ Click the "Expand" button or the screenshot to:
 ### Data Flow
 
 1. **Agent Discovers Page** → Screenshot captured
-2. **YOLO Detection Runs** → Bounding boxes calculated
+2. **Visual Detection Runs** → Bounding boxes calculated
 3. **Data Stored** → Page added to discovered pages array
 4. **Graph Updates** → New node and connections added
 5. **Metrics Update** → Real-time statistics recalculated

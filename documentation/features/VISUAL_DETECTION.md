@@ -1,8 +1,8 @@
-# YOLO-Style Visual Detection
+# Computer Vision AI Detection
 
 ## Overview
 
-QA Elevate uses YOLO (You Only Look Once) style computer vision to detect interactive elements on web pages **visually** - without relying on CSS selectors, XPath, or DOM inspection. This approach mimics how a human would identify clickable elements just by looking at a screenshot.
+QA Elevate uses advanced computer vision AI to detect interactive elements on web pages **visually** - without relying on CSS selectors, XPath, or DOM inspection. This approach mimics how a human would identify clickable elements just by looking at a screenshot.
 
 ## Why Visual Detection?
 
@@ -44,7 +44,7 @@ const screenshot = await page.screenshot({
 });
 ```
 
-### 2. YOLO Object Detection
+### 2. Computer Vision Analysis
 
 The system identifies interactive elements using computer vision:
 
@@ -332,18 +332,15 @@ expect(button.boundingBox.y).toBeCloseTo(65, 1);
 ```typescript
 import { DiscoveredPage } from '@/types';
 
-// After YOLO detection runs
-const detectedPage: DiscoveredPage = {
-  id: 'page-001',
-  url: 'https://app.example.com',
-  screenshot: '/screenshots/page-001.png',
+// After visual detection runs
+const page = {
+  url: 'https://example.com/checkout',
+  screenshot: 'base64_image_data',
   interactionDetails: {
-    buttons: yoloDetectButtons(screenshot),
-    links: yoloDetectLinks(screenshot),
-    forms: yoloDetectForms(screenshot),
-    inputs: yoloDetectInputs(screenshot)
-  }
-};
+    buttons: detectButtons(screenshot),
+    links: detectLinks(screenshot),
+    forms: detectForms(screenshot),
+    inputs: detectInputs(screenshot)
 
 // Use in test generation
 const tests = generateTestsFromDetections(detectedPage);
@@ -403,7 +400,7 @@ function validateBoundingBox(box: BoundingBox): boolean {
 
 ## Summary
 
-YOLO-style visual detection represents a paradigm shift in automated testing:
+Computer vision-based visual detection represents a paradigm shift in automated testing:
 
 - **From code-based to vision-based element location**
 - **From brittle selectors to robust visual positioning**

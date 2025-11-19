@@ -363,13 +363,13 @@ export function DiscoveryExplorationTab({
                 </div>
               </div>
 
-              {/* Screenshot with YOLO Detection */}
+              {/* Screenshot with Visual Detection */}
               {selectedPage.screenshot && (
                 <div>
                   <h4 className="text-sm font-medium text-white mb-2 flex items-center justify-between">
                     <span className="flex items-center">
                       <Image className="w-4 h-4 mr-2 text-cyan-400" />
-                      YOLO Object Detection
+                      Visual Element Detection
                     </span>
                     <button 
                       onClick={() => setExpandedScreenshot(true)}
