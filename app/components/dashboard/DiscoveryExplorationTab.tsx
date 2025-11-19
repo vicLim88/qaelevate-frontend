@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Activity, Eye, Layers, Zap, Search, X, MousePointer, FormInput, Link as LinkIcon, Image } from 'lucide-react';
+import { Globe, Activity, Eye, Layers, Zap, Search, X, MousePointer, FormInput, Link as LinkIcon, Image, HelpCircle } from 'lucide-react';
 import type { DiscoveredPage } from '@/types/test.types';
 import ReactFlow, { 
   Node, 
@@ -33,6 +33,15 @@ export function DiscoveryExplorationTab({
   const [selectedPage, setSelectedPage] = useState<DiscoveredPage | null>(null);
   const [hoveredElement, setHoveredElement] = useState<string | null>(null);
   const [expandedScreenshot, setExpandedScreenshot] = useState<boolean>(false);
+  const [hoveredMetric, setHoveredMetric] = useState<string | null>(null);
+
+  // Metric explanations in simple English
+  const metricExplanations = {
+    pagesDiscovered: "Total number of unique pages our AI has found in your application so far.",
+    depthReached: "How many clicks deep we've explored. Higher depth means we've tested more complex user journeys.",
+    pagesPerMinute: "Speed of discovery - how many new pages our AI is finding every minute.",
+    coverage: "Estimated percentage of your entire application that we've discovered and mapped."
+  };
 
   // Handle ESC key to close modal
   React.useEffect(() => {
@@ -149,7 +158,12 @@ export function DiscoveryExplorationTab({
 
       {/* Metrics */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl p-4 border border-white/10">
+        {/* Pages Discovered */}
+        <div 
+          className="bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl p-4 border border-white/10 relative"
+          onMouseEnter={() => setHoveredMetric('pagesDiscovered')}
+          onMouseLeave={() => setHoveredMetric(null)}
+        >
           <div className="flex items-center justify-between mb-2">
             <Globe className="w-5 h-5 text-purple-400" />
             {isExploring && (
@@ -160,25 +174,72 @@ export function DiscoveryExplorationTab({
             )}
           </div>
           <div className="text-2xl font-bold text-white">{explorationMetrics.totalPages}</div>
-          <div className="text-sm text-gray-400">Pages Discovered</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-400">Pages Discovered</div>
+            <HelpCircle className="w-4 h-4 text-gray-500" />
+          </div>
+          {hoveredMetric === 'pagesDiscovered' && (
+            <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-gray-900 border border-purple-500/50 rounded-lg p-3 shadow-xl">
+              <p className="text-xs text-gray-200">{metricExplanations.pagesDiscovered}</p>
+            </div>
+          )}
         </div>
 
-        <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl p-4 border border-white/10">
+        {/* Depth Reached */}
+        <div 
+          className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl p-4 border border-white/10 relative"
+          onMouseEnter={() => setHoveredMetric('depthReached')}
+          onMouseLeave={() => setHoveredMetric(null)}
+        >
           <Layers className="w-5 h-5 text-blue-400 mb-2" />
           <div className="text-2xl font-bold text-white">{explorationMetrics.explorationDepth}</div>
-          <div className="text-sm text-gray-400">Depth Reached</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-400">Depth Reached</div>
+            <HelpCircle className="w-4 h-4 text-gray-500" />
+          </div>
+          {hoveredMetric === 'depthReached' && (
+            <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-gray-900 border border-blue-500/50 rounded-lg p-3 shadow-xl">
+              <p className="text-xs text-gray-200">{metricExplanations.depthReached}</p>
+            </div>
+          )}
         </div>
 
-        <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl p-4 border border-white/10">
+        {/* Pages Per Minute */}
+        <div 
+          className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl p-4 border border-white/10 relative"
+          onMouseEnter={() => setHoveredMetric('pagesPerMinute')}
+          onMouseLeave={() => setHoveredMetric(null)}
+        >
           <Zap className="w-5 h-5 text-green-400 mb-2" />
           <div className="text-2xl font-bold text-white">{explorationMetrics.pagesPerMinute}</div>
-          <div className="text-sm text-gray-400">Pages/Minute</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-400">Pages/Minute</div>
+            <HelpCircle className="w-4 h-4 text-gray-500" />
+          </div>
+          {hoveredMetric === 'pagesPerMinute' && (
+            <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-gray-900 border border-green-500/50 rounded-lg p-3 shadow-xl">
+              <p className="text-xs text-gray-200">{metricExplanations.pagesPerMinute}</p>
+            </div>
+          )}
         </div>
 
-        <div className="bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl p-4 border border-white/10">
+        {/* Coverage */}
+        <div 
+          className="bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl p-4 border border-white/10 relative"
+          onMouseEnter={() => setHoveredMetric('coverage')}
+          onMouseLeave={() => setHoveredMetric(null)}
+        >
           <Search className="w-5 h-5 text-orange-400 mb-2" />
           <div className="text-2xl font-bold text-white">{explorationMetrics.coverage}%</div>
-          <div className="text-sm text-gray-400">Coverage</div>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-400">Coverage</div>
+            <HelpCircle className="w-4 h-4 text-gray-500" />
+          </div>
+          {hoveredMetric === 'coverage' && (
+            <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-gray-900 border border-orange-500/50 rounded-lg p-3 shadow-xl">
+              <p className="text-xs text-gray-200">{metricExplanations.coverage}</p>
+            </div>
+          )}
         </div>
       </div>
 
